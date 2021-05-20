@@ -6,8 +6,8 @@
 // (or the latch pin of the 74HC595)
 LiquidCrystal lcd(10);
 
-int led1 = 1;
-int led2 = 2;
+int led1 = A5;
+int led2 = A4;
 int led3 = 3;
 int led4 = 4;
 int led5 = 5;
