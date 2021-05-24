@@ -85,6 +85,8 @@ void loop() {
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
     lcd.print("desired:82");
+    lcd.setCursor(0, 0);
+    lcd.print("current:");
     desired = 82;
     oldState = currentState;
     break;
@@ -98,6 +100,8 @@ void loop() {
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
     lcd.print("desired:110");
+    lcd.setCursor(0, 0);
+    lcd.print("current:");
     desired = 110;
     oldState = currentState;
     break;
@@ -111,6 +115,8 @@ void loop() {
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
     lcd.print("desired:147");
+    lcd.setCursor(0, 0);
+    lcd.print("current:");
     desired = 147;
     oldState = currentState;
     break;
@@ -124,6 +130,8 @@ void loop() {
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
     lcd.print("desired:196");
+    lcd.setCursor(0, 0);
+    lcd.print("current:");
     desired = 196;
     oldState = currentState;
     break;
@@ -137,6 +145,8 @@ void loop() {
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
     lcd.print("desired:247");
+    lcd.setCursor(0, 0);
+    lcd.print("current:");
     desired = 247;
     oldState = currentState;
     break;
@@ -150,6 +160,8 @@ void loop() {
     digitalWrite(led6, HIGH);
     lcd.setCursor(0, 1);
     lcd.print("desired:330");
+    lcd.setCursor(0, 0);
+    lcd.print("current:");
     desired = 330;
     oldState = currentState;
     break;
@@ -162,9 +174,9 @@ void loop() {
     digitalWrite(led5, LOW);
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
-    lcd.print("desired:        ");
+    lcd.print("                ");
     lcd.setCursor(0, 0);
-    lcd.print("current:         ");
+    lcd.print("                ");
     desired = 0;
     oldState = 0;
     break;
