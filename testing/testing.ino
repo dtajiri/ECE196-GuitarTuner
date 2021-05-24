@@ -9,7 +9,7 @@ LiquidCrystal lcd(10);
 #include "arduinoFFT.h"
  
 #define SAMPLES 128             //SAMPLES-pt FFT. Must be a base 2 number. Max 128 for Arduino Uno.
-#define SAMPLING_FREQUENCY 2000 //Ts = Based on Nyquist, must be 2 times the highest expected frequency.
+#define SAMPLING_FREQUENCY 2400 //Ts = Based on Nyquist, must be 2 times the highest expected frequency.
  
 arduinoFFT FFT = arduinoFFT();
  
@@ -37,10 +37,16 @@ int currentState = 0;
 int oldState = 0;
 int desired;
 int rounded;
+int turn;
+int peak;
+int difference;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600); //Baud rate for the Serial Monitor
+  pinMode(speedPin, OUTPUT);
+  pinMode(dir1, OUTPUT);
+  pinMode(dir2, OUTPUT);
   pinMode(led1,OUTPUT);
   pinMode(led2,OUTPUT);
   pinMode(led3,OUTPUT);
@@ -78,7 +84,7 @@ void loop() {
     digitalWrite(led5, LOW);
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
-    lcd.print("desired: 82");
+    lcd.print("desired:82");
     desired = 82;
     oldState = currentState;
     break;
@@ -91,7 +97,7 @@ void loop() {
     digitalWrite(led5, LOW);
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
-    lcd.print("desired: 110");
+    lcd.print("desired:110");
     desired = 110;
     oldState = currentState;
     break;
@@ -104,7 +110,7 @@ void loop() {
     digitalWrite(led5, LOW);
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
-    lcd.print("desired: 147");
+    lcd.print("desired:147");
     desired = 147;
     oldState = currentState;
     break;
@@ -117,7 +123,8 @@ void loop() {
     digitalWrite(led5, LOW);
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
-    lcd.print("desired: 196");
+    lcd.print("desired:196");
+    desired = 196;
     oldState = currentState;
     break;
 
@@ -129,7 +136,8 @@ void loop() {
     digitalWrite(led5, HIGH);
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
-    lcd.print("desired: 247");
+    lcd.print("desired:247");
+    desired = 247;
     oldState = currentState;
     break;
 
@@ -141,7 +149,8 @@ void loop() {
     digitalWrite(led5, LOW);
     digitalWrite(led6, HIGH);
     lcd.setCursor(0, 1);
-    lcd.print("desired: 330");
+    lcd.print("desired:330");
+    desired = 330;
     oldState = currentState;
     break;
     
@@ -156,37 +165,90 @@ void loop() {
     lcd.print("desired:        ");
     lcd.setCursor(0, 0);
     lcd.print("current:         ");
+    desired = 0;
     oldState = 0;
     break;
   }
-  
-  digitalValue=digitalRead(digPin);
-  Serial.println(digitalValue);
-    if(digitalValue==HIGH){ 
-      /*Sample SAMPLES times*/
-      for(int i=0; i<SAMPLES; i++)
-      {
-          microSeconds = micros();    //Returns the number of microseconds since the Arduino board began running the current script. 
-       
-          vReal[i] = analogRead(anaPin); //Reads the value from analog pin 0 (A0), quantize it and save it as a real term.
-          vImag[i] = 0; //Makes imaginary term 0 always
-  
-          /*remaining wait time between samples if necessary*/
-          while(micros() < (microSeconds + samplingPeriod))
-          {
-            //do nothing
-          }
-      }
-   
-      /*Perform FFT on samples*/
-      FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
-      FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
-      FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
-  
-      /*Find peak frequency and print peak*/
-      double peak = FFT.MajorPeak(vReal, SAMPLES, SAMPLING_FREQUENCY);
-      Serial.println(peak);     //Print out the most dominant frequency.
-      lcd.setCursor(0, 0);
-      lcd.print("current: ");lcd.println(peak);
-   }
+
+  if(desired != 0){
+    digitalValue=digitalRead(digPin);
+      if(digitalValue==HIGH){ 
+        /*Sample SAMPLES times*/
+        for(int i=0; i<SAMPLES; i++)
+        {
+            microSeconds = micros();    //Returns the number of microseconds since the Arduino board began running the current script. 
+         
+            vReal[i] = analogRead(anaPin); //Reads the value from analog pin 0 (A0), quantize it and save it as a real term.
+            vImag[i] = 0; //Makes imaginary term 0 always
+    
+            /*remaining wait time between samples if necessary*/
+            while(micros() < (microSeconds + samplingPeriod))
+            {
+              //do nothing
+            }
+        }
+     
+        /*Perform FFT on samples*/
+        FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+        FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
+        FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
+    
+        /*Find peak frequency and print peak*/
+        double peak = FFT.MajorPeak(vReal, SAMPLES, SAMPLING_FREQUENCY);
+        Serial.println(peak);     //Print out the most dominant frequency.
+        if(desired == 82){
+          peak = peak - 87;
+        }
+        if(desired == 110){
+          peak = peak - 3;
+        }
+        if(desired == 147){
+          peak = peak - 3;
+        }
+        if(desired == 196){
+          peak = peak - 6;
+        }
+        if(desired == 247){
+          peak = peak - 5;
+        }
+        if(desired == 330){
+          peak = peak - 9;
+        }
+        lcd.setCursor(0, 0);
+        lcd.print("current:");lcd.print(peak);
+        if(desired != 0){
+           Serial.print("desired:"); Serial.println(desired);
+           Serial.print("peak:");Serial.println(peak);
+           if(peak != desired){
+              difference = desired - peak;
+              Serial.print("difference: ");Serial.println(difference);
+              if(abs(difference) > 1){            
+                  if(desired < peak){
+                    Serial.print("higher than desired");
+                    delay(2000);
+                    digitalWrite(dir1,LOW);
+                    digitalWrite(dir2,HIGH);
+                    analogWrite(speedPin, mSpeed);
+                    turn = (peak - desired) * 500; 
+                    delay(turn);
+                    digitalWrite(dir1,LOW);
+                    digitalWrite(dir2,LOW);
+                    delay(500);  
+                  }else{
+                    Serial.print("lower than desired");
+                    delay(2000);
+                    digitalWrite(dir1,HIGH);
+                    digitalWrite(dir2,LOW);
+                    analogWrite(speedPin, mSpeed);
+                    turn = (desired - peak) * 500; 
+                    delay(turn);
+                    digitalWrite(dir1,LOW);
+                    digitalWrite(dir2,LOW);
+                    delay(500);
+                  }
+              }
+           }
+        }
+    }
+  }
 }
