@@ -27,7 +27,7 @@ int led3 = 3;
 int led4 = 4;
 int led5 = 5;
 int led6 = 6;
-int buttonPin = 7;
+int buttonPin = A3;
 int speedPin = 9;
 int dir1 = 8;
 int dir2 = 12;
@@ -65,6 +65,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   buttonState = digitalRead(buttonPin); // Read whether or not the button is on or off
+
   if (buttonState == 1){ //button has been pressed
     delay(50);
     buttonState = digitalRead(buttonPin);
@@ -84,9 +85,9 @@ void loop() {
     digitalWrite(led5, LOW);
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
-    lcd.print("desired:82");
+    lcd.print("d:82");
     lcd.setCursor(0, 0);
-    lcd.print("current:");
+    lcd.print("c:");
     desired = 82;
     oldState = currentState;
     break;
@@ -99,9 +100,9 @@ void loop() {
     digitalWrite(led5, LOW);
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
-    lcd.print("desired:110");
+    lcd.print("d:110");
     lcd.setCursor(0, 0);
-    lcd.print("current:");
+    lcd.print("c:");
     desired = 110;
     oldState = currentState;
     break;
@@ -114,9 +115,9 @@ void loop() {
     digitalWrite(led5, LOW);
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
-    lcd.print("desired:147");
+    lcd.print("d:147");
     lcd.setCursor(0, 0);
-    lcd.print("current:");
+    lcd.print("c:");
     desired = 147;
     oldState = currentState;
     break;
@@ -129,9 +130,9 @@ void loop() {
     digitalWrite(led5, LOW);
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
-    lcd.print("desired:196");
+    lcd.print("d:196");
     lcd.setCursor(0, 0);
-    lcd.print("current:");
+    lcd.print("c:");
     desired = 196;
     oldState = currentState;
     break;
@@ -144,9 +145,9 @@ void loop() {
     digitalWrite(led5, HIGH);
     digitalWrite(led6, LOW);
     lcd.setCursor(0, 1);
-    lcd.print("desired:247");
+    lcd.print("d:247");
     lcd.setCursor(0, 0);
-    lcd.print("current:");
+    lcd.print("c:");
     desired = 247;
     oldState = currentState;
     break;
@@ -159,9 +160,9 @@ void loop() {
     digitalWrite(led5, LOW);
     digitalWrite(led6, HIGH);
     lcd.setCursor(0, 1);
-    lcd.print("desired:330");
+    lcd.print("d:330");
     lcd.setCursor(0, 0);
-    lcd.print("current:");
+    lcd.print("c:");
     desired = 330;
     oldState = currentState;
     break;
@@ -209,35 +210,35 @@ void loop() {
         double peak = FFT.MajorPeak(vReal, SAMPLES, SAMPLING_FREQUENCY);
         Serial.println(peak);     //Print out the most dominant frequency.
         if(desired == 82){
-          peak = peak - 87;
+          peak = peak - 88;
         }
         if(desired == 110){
-          peak = peak - 3;
+          peak = peak - 116;
         }
         if(desired == 147){
-          peak = peak - 3;
+          peak = peak - 4;
         }
         if(desired == 196){
           peak = peak - 6;
         }
         if(desired == 247){
-          peak = peak - 5;
+          peak = peak - 6;
         }
         if(desired == 330){
           peak = peak - 9;
         }
         lcd.setCursor(0, 0);
-        lcd.print("current:");lcd.print(peak);
+        lcd.print("c:");lcd.print(peak);
         if(desired != 0){
            Serial.print("desired:"); Serial.println(desired);
            Serial.print("peak:");Serial.println(peak);
            if(peak != desired){
               difference = desired - peak;
               Serial.print("difference: ");Serial.println(difference);
-              if(abs(difference) > 1){            
+              if(abs(difference) > .2){            
                   if(desired < peak){
                     Serial.print("higher than desired");
-                    delay(2000);
+                    delay(500);
                     digitalWrite(dir1,LOW);
                     digitalWrite(dir2,HIGH);
                     analogWrite(speedPin, mSpeed);
